@@ -8,3 +8,9 @@ Right now this project is been developed by stefi and accept contriibutions, iss
 please reach out: 
 - DISCORD: stefi_says#1654
 - TWITTER: @stefi_says
+
+### Installation
+
+```bash	
+pip install -r requirements.txt
+```
