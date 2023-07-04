@@ -1,5 +1,6 @@
 streamlit
 pandas
 plotly
+plotly_express
 seaborn
-whois
+python-whois
