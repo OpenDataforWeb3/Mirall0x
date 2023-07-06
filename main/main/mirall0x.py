@@ -11,11 +11,14 @@ import datetime
 import plotly_express as px 
 import seaborn as sns
 import matplotlib.pyplot as plt
-
+import requests
+from requests.auth import HTTPBasicAuth
+import whois
 
 from datetime import datetime as dt
 from datetime import timedelta
-import whois
+
+
 
 
 
@@ -44,6 +47,56 @@ def subtract_weeks(week_number, year):
     new_year = int(new_date.strftime("%Y"))
     return new_week_number, new_year
 
+def first_wallet_transaction(walletAddress,api_key,chainName):
+    
+    wallets = []
+    answers = []
+    
+    url = f"https://api.covalenthq.com/v1/{chainName}/bulk/transactions/{walletAddress}/"
+
+    headers = {
+        "accept": "application/json",
+    }
+
+    basic = HTTPBasicAuth(api_key, '')
+
+    response = requests.get(url, headers=headers, auth=basic, verify = False)
+
+    if ((response.status_code == 200) & (len(response.json()['data']['items']) != 0)) == True:
+
+        first_trx= response.json()['data']['items'][0]['block_signed_at']
+        first_trx = first_trx.split("T")[0]
+        first_trx  = dt.strptime(first_trx , '%Y-%m-%d')
+        answers.append(first_trx)
+        wallets.append(walletAddress)
+
+    else: 
+        wallets.append(walletAddress)
+        answers.append('no data on this chain')
+    return wallets[0], answers[0]
+
+@st.cache_data
+def wallets_age(addresses, api_key,chainName, round_start):
+    
+    w_creation_date = []
+    address = []
+    for i in addresses:
+        address.append(i)
+        w_creation_date.append(first_wallet_transaction(i,api_key,chainName)[1])
+
+   
+    w_creation = pd.DataFrame(data= {'address': address, f'w_creation_date_{chainName}': w_creation_date})
+
+    months = []
+    for i in range(0,w_creation[f'w_creation_date_{chainName}'].shape[0]):
+        if (w_creation[f'w_creation_date_{chainName}'][i] != 'no data on this chain'):
+            months.append(((dt.strptime(round_start,"%Y-%m-%d").date() - w_creation[f'w_creation_date_{chainName}'][i].date()).days)/30)
+        else:
+            months.append(None)
+    
+    w_creation[f'wallet_months_old_{chainName}'] = months
+    return w_creation
+
 
 @st.cache_data
 def input_csv(file):
@@ -51,7 +104,7 @@ def input_csv(file):
     return(df)
 
 @st.cache_data
-def subprocess_github_lego(git_parameters):
+def subprocess_github_lego(git_parameters): # issue 7- 8 - 9
     output = subprocess.run(['python', 'github_activity_lego.py'], input =(git_parameters).encode(), capture_output = True)
 
     return(output)
@@ -65,8 +118,6 @@ def website_validation_lego(website_lists):
     web_df = web_df.drop(web_df[web_df.duplicated()].index)
     web_df.reset_index(drop = True, inplace = True)   
 
-    ##### ISSUE - adicionar no MIro - add cache porque faz as verificaçãoes do website
-    ##### add some loading bar here too
 
     website_date_evaluation = []
 
@@ -90,6 +141,13 @@ def website_validation_lego(website_lists):
     web_df['website_date_evaluation'] = website_date_evaluation
     return web_df
 
+
+
+#______________________ Assets 
+
+covalent_chains = ['eth-mainnet' , 'optimism-mainnet' , 'matic-mainnet' , 'btc-mainnet' ] ## issue #12
+  
+api_key = ''  
 #________________________ main __________________________________________________________________________
 
 
@@ -103,9 +161,9 @@ with header:
 
 with inputs:
     
-    st.markdown("#### PROJECTS TO CHECK")  # trocar aqui por dados direto da chain com os meta dados  dos projetos inscritos? verificar doc do ALLO
+    st.markdown("#### PROJECTS TO CHECK")  
     # File uploader
-    file = st.file_uploader("Upload CSV file, please check the docs for the correct schema", type="csv", key = 'main_csv')
+    file = st.file_uploader("Upload CSV file, please check the docs for the correct schema", type="csv", key = 'main_csv') # issue 3 
     
 
     if file:
@@ -114,7 +172,7 @@ with inputs:
             file_name = file.name
             st.markdown("###### THE INPUTED CSV:")
             st.dataframe(df)
-            series = list(df['github_project_url'].copy()) # ajustar pro schema final
+            series = list(df['github_project_url'].copy()) 
 
 
     st.markdown("#### INPUTS AND PARAMETERS")
@@ -124,7 +182,7 @@ with inputs:
 with col1 : 
     git_PAT = st.text_input('please enter yout github PAT', key = 'git_PAT')
     round_start = st.text_input('input the round start date (or round subscription date) like "yyyy-mm-dd"' , key = 'round_start') 
-
+    chainName = st.selectbox('Select the chain you would like to check the walle', covalent_chains) 
                     
     main_button =  st.button('SEND PARAMETERS')
 
@@ -133,8 +191,10 @@ with col1 :
             st.session_state.start_button = False 
     
     
-###### issue -- aqui que entra a escolha do lego o botão dipara os calculos de acordo com as legos escolhidos não direto pro git hub
+
     if main_button or st.session_state.start_button:
+        
+        #round_start = dt.strptime(round_start,"%Y-%m-%d").date()
         
         st.session_state.start_button = True 
         start_week = dt.strptime(round_start,"%Y-%m-%d").date().isocalendar().week
@@ -147,17 +207,21 @@ with col1 :
         output = subprocess_github_lego(git_parameters)
         
         st.write(output.stdout.decode())
+        
+        #________________________ legos 
 
 
         with legos:
 
-                legos_avaluations = df[['website', 'github_project_url']].copy()
+
+                legos_avaluations = df[['title_x', 'website', 'github_project_url','address_x']].copy() 
 
 
-#_______________________________________github lego
+
+        #_______________________________________github lego age
 
                 repo_additions = pd.read_csv('repo_additions.csv') 
-    
+
                 repo_additions.rename(columns = {'Unnamed: 0': 'github_project_url'}, inplace = True)
 
                 inactive_weeks = repo_additions.set_index('github_project_url').T.isna().sum()
@@ -170,105 +234,173 @@ with col1 :
                 active_months = active_months.reset_index().copy()
 
 
-#______________________________________website validation lego 
-    
-                
+        #_________________________________________ github lego inesxistant repo code (404)
+
+                raw = pd.read_csv('repo_raw_data.csv')
+
+                invadalid_repos = list(raw[raw['extract_status_code'] == 404]['url'])
+
+                invadalid_repo = np.where(df['github_project_url'].isin(invadalid_repos), True, False)
+
+                legos_avaluations['invadalid_repo'] = invadalid_repo
+
+
+
+
+
+        #______________________________________website validation lego 
+
+
                 web_df = website_validation_lego(df['website'].copy())
 
-                last_update_days = []
-                website = []
                 available_dates = web_df[(web_df['website_date_evaluation'] != 'no date available')
                            &  (web_df['website_date_evaluation'] != 'website not working')].copy()
-
                 available_dates.reset_index(inplace = True)
-                
-                    
+
+
+                months_of_existance = []
+                website = []
                 for i in range(0,available_dates.shape[0]):
 
-                    last_update_days.append((((dt.strptime(round_start,"%Y-%m-%d").date()) - available_dates['website_date_evaluation'][i])).days)
+                    months_of_existance.append(((((dt.strptime(round_start,"%Y-%m-%d").date()) - available_dates['website_date_evaluation'][i])).days)/30)
 
                     website.append(available_dates['website'][i])
 
-                count_days_df = pd.DataFrame(data = {'website': website,'last_update_days' : last_update_days})
+                count_days_df = pd.DataFrame(data = {'website': website,'months_of_existance' : months_of_existance})
 
+                
+         #_________________________________ wallet_age lego
+        
+                legos_avaluations.rename(columns = {'address_x' : 'address'},inplace = True) ### issue #3 - to be altered when adapeted to Allo Schema
+                addresses = legos_avaluations['address'].copy().dropna()
+                addresses = addresses.reset_index(drop = True)
+                
+                
+                wallet_age_lego = wallets_age(addresses, api_key,chainName, round_start)
+                
 
-    ## ________________merging legos results 
+                
+
+        ## ________________merging legos results 
 
                 legos_avaluations = legos_avaluations.merge(active_months, on = 'github_project_url', how = 'left')  # github lego 
                 legos_avaluations = legos_avaluations.merge(web_df, on = 'website', how = 'left')# website evaluations
                 legos_avaluations = legos_avaluations.merge(count_days_df, on = 'website', how = 'left') # website available dates days count
-                st.markdown('###### DATAFRAME WITH PROJECTS METADATA')
+                legos_avaluations = legos_avaluations.merge(wallet_age_lego, on = 'address', how = 'left')  # wallet age lego for the chooson chain
+
 
                 legos_avaluations.to_csv('legos_avaluations.csv', index = False)
-                st.write(legos_avaluations)
+#                 st.write(legos_avaluations)
 
         #_______________________________________ legos weights
 
-                with weights: 
-                    ### could cache the reading
-                    @st.cache_data
-                    def read_lego_df(csv_name):
-                        legos_avaluations = pd.read_csv(csv_name) 
-                        return legos_avaluations
+        with weights: 
+           
+            @st.cache_data
+            def read_lego_df(csv_name):
+                legos_avaluations = pd.read_csv(csv_name) 
+                return legos_avaluations
+
+            legos_avaluations = read_lego_df('legos_avaluations.csv')
+            legos_avaluations['web_not_working'] = np.where(legos_avaluations['website_date_evaluation'] =='website not working', True, False)
+            legos_avaluations[f'no_history_{chainName}'] = np.where(legos_avaluations[f'w_creation_date_{chainName}'] =='no data on this chain', True, False)
+            
+            
+            
+            with st.form('weights'):
+               
+                st.markdown("#### WEIGHTING THE LEGOS")
+                st.markdown("input the weight for each lego (from -3 to 3) given your understand of the importance of each analysis. Remenber: the final score represents how trustworth a project is, so positive weights means trustfull behaviour, there fore posite scores and vice-versa")
                 
-                    legos_avaluations = read_lego_df('legos_avaluations.csv')
+                col3,col4 = st.columns(2)
+                with col3:
+
+                    weight_githb_active_months = st.number_input("input weight for every month the Github repo existed ", step = 1, key = "weight_githb_active_months")
                     
-                    legos_avaluations['web_not_working'] = np.where(legos_avaluations['website_date_evaluation'] =='website not working', True, False)
+                    weight_web_days = st.number_input("input a weight for every month that a website existed", step = 1, key = "weight_web_date")
 
-                    with st.form('weights'):
-                        #### can I created a session a way of not rerinning when changing here?
-                        st.markdown("#### WEIGHTING THE LEGOS")
-                        st.markdown("input the weight for each lego (from -3 to 3) given your understand of the importance of each analysis. Remenber: the final score represents how trustworth a project is, so positive weights means trustfull behaviour, there fore posite scores and vice-versa")
-                        weight_githb_active_months = st.number_input("input weight for each month of existence of the Github repo", step = 1, key = "weight_githb_less_1")
-                       
-                        weight_website = st.number_input("input weights for websites that are not working", step = 1, key = "weight_website") 
-                        weight_web_days = st.number_input("input a weight for every day that a website existed before the start of your round", step = 0.001, key = "weight_web_date") 
+                    weight_wallet_age = st.number_input("input weight for each month old of the wallet on the choosen chain", step = 1, key = "weight_wallet_age")
+                   
+                    
+                
+                with col4:
+                    
+                    weight_githb_not_working = st.number_input("input weight for a Github repo that is not available", step = 1, key = "weight_githb_not_working")
+
+                    
+                    weight_website = st.number_input("input weight for a website that is not available", step = 1, key = "weight_website") 
+                    
+                    
+                    weight_no_chain_history  = st.number_input("input weight for project wallet that have no transaction hitory", step = 1, key = "weight_no_chain_history")
+                    
+                    
+                    
+                    
+                    
+            #_________________________________________scores calculations
+            
+            
+                calculations_button = st.form_submit_button('START CALCULATIONS')
+
+            if 'calc_button' not in st.session_state: 
+                st.session_state.calc_button = False 
+
+            if calculations_button or st.session_state.calc_button:
+                    github_score = []
+
+                    web_score = [] 
+                    
+                    wallet_age_score = []
+
+                    for i in range( 0, legos_avaluations.shape[0]):
+
+                        github_score.append(np.nansum([
+                                 weight_githb_active_months * legos_avaluations['months_active'][i],
+                                 weight_githb_not_working* legos_avaluations['invadalid_repo'][i]]))
 
 
-                        calculations_button = st.form_submit_button('START CALCULATIONS')
+                    for i in range( 0, legos_avaluations.shape[0]):
 
-                    if 'calc_button' not in st.session_state: 
-                        st.session_state.calc_button = False 
+                        web_score.append(( np.nansum([
+                        weight_website * legos_avaluations['web_not_working'][i], 
+                        weight_web_days * legos_avaluations['months_of_existance'][i]])))
+
+                    
+                    for i in range( 0, legos_avaluations.shape[0]):
+
+                        wallet_age_score.append(( np.nansum([
+                        weight_no_chain_history * legos_avaluations[f'no_history_{chainName}'][i], 
+                        weight_wallet_age * legos_avaluations[f'wallet_months_old_{chainName}'][i]])))
                         
-                    if calculations_button or st.session_state.calc_button:
-                            github_score = []
+                        
 
-                            web_score = [] 
+                    legos_avaluations['web_score'] = web_score
+                    legos_avaluations['github_score'] = github_score
+                    legos_avaluations['wallet_age_score'] = wallet_age_score
 
-                            for i in range( 0, legos_avaluations.shape[0]):
+                    legos_avaluations['score'] = (
+                    legos_avaluations['web_score'] + 
+                    legos_avaluations['github_score'] + 
+                    legos_avaluations['wallet_age_score']
+                    )
 
-                                github_score.append(np.nansum(
-                                         weight_githb_active_months * legos_avaluations['months_active'][i]))
+                    plot  = px.scatter_3d(legos_avaluations, x ='github_score', y = 'wallet_age_score', z = 'score'  , color = 'score' , hover_data =[legos_avaluations['github_project_url']]
+                )
+                    
+              #________________________________________ vizualisation      
+            
+                    ### -  issue #14 #15
 
-
-                            for i in range( 0, legos_avaluations.shape[0]):
-
-                                web_score.append(( np.nansum([
-                                weight_website * legos_avaluations['web_not_working'][i], 
-                                weight_web_days * legos_avaluations['last_update_days'][i]])))
-
-
-                            legos_avaluations['web_score'] = web_score
-                            legos_avaluations['github_score'] = github_score
-
-
-                            legos_avaluations['score'] = legos_avaluations['web_score'] + legos_avaluations['github_score']
-
-                            plot  = px.scatter_3d(legos_avaluations, x ='github_score', y = 'web_score', z = 'score'  , color = 'score' , hover_data =[legos_avaluations['github_project_url']]
-                        )
-                            ### -  issue colocar comunicaçao para pessoa ver em full screen 
-
-                            st.markdown("### VIZUALISE AND COMPARE THE PROJECTs")
-                            st.markdown("tip : click on the two arrows on the right corner to full screen the graph. Hover the mouse to see more information of each dot (projet)") 
-                            st.plotly_chart(plot)
-                            st.markdown("")
-                            st.markdown("#### CHECK THE PROJECT INFORMATIONS AND SCORES")
-                            st.write(legos_avaluations)
+                    st.markdown("### VIZUALISE AND COMPARE THE PROJECTs")
+                    st.markdown("tip : click on the two arrows on the right corner to full screen the graph. Hover the mouse to see more information of each dot (projet)") 
+                    st.plotly_chart(plot)
+                    st.markdown("")
+                    st.markdown("#### CHECK THE PROJECT INFORMATIONS AND SCORES")
+                    st.write(legos_avaluations)
 
 
 
-# with download_archives: 
-    
+  
 
             
         
