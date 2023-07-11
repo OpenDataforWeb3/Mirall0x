@@ -45,8 +45,8 @@ def github_code_stats( owner, repo, authorization_token):
     headers = {
      'X-GitHub-Api-Version': '2022-11-28', 
      'accept':'application/vnd.github+json', 
-     'Authorization': authorization_token
-     }
+     'Authorization': f'Bearer {git_PAT}'
+    }
 
     response = requests.get(url.format(owner=owner, repo=repo), headers=headers, verify = False)
     response_status = response.status_code
@@ -381,7 +381,8 @@ def website_validation_lego(website_lists):
 
 covalent_chains = ['eth-mainnet' , 'optimism-mainnet' , 'matic-mainnet' , 'btc-mainnet' ] ## issue #12
   
-api_key = 'cqt_rQ44vgX89Hh34tFH7qqvjdpmJhVm'  
+api_key = st.secrets['api_key']
+git_PAT = st.secrets['git_PAT']
 #________________________ main __________________________________________________________________________
 
 
@@ -413,7 +414,6 @@ with inputs:
     col1,col2 = st.columns(2) 
     
 with col1 : 
-    git_PAT = st.text_input('please enter yout github PAT', key = 'git_PAT')
     round_start = st.text_input('input the round start date (or round subscription date) like "yyyy-mm-dd"' , key = 'round_start') 
     chainName = st.selectbox('Select the chain you would like to check the walle', covalent_chains) 
                     
