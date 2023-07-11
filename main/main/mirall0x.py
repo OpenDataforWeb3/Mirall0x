@@ -382,7 +382,7 @@ def website_validation_lego(website_lists):
 covalent_chains = ['eth-mainnet' , 'optimism-mainnet' , 'matic-mainnet' , 'btc-mainnet' ] ## issue #12
   
 api_key = st.secrets['covalent_api']
-git_PAT = st.secrets['git_PAT']
+git_PAT = st.secrets['github_PAT']
 #________________________ main __________________________________________________________________________
 
 
