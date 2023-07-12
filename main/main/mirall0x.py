@@ -524,7 +524,7 @@ with col1 :
          #_________________________________ wallet_age lego
         
                 recipients = legos_avaluations['recipient'].copy().dropna()
-                recipients = addresses.reset_index(drop = True)
+                recipients = recipients.reset_index(drop = True)
                 
                 
                 wallet_age_lego = wallets_age(recipients, api_key,chainName, round_start)
