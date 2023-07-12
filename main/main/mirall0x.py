@@ -390,7 +390,7 @@ git_PAT = st.secrets['github_PAT']
 with header: 
     st.title('Mirall0x') 
     st.markdown('#### Welcome!')
-    st.markdown('This is an open source project developed to empower communities when analyzing candidates for grants. It uses on-chain and off-chain metadata to deliver quality information in a centralized and visual way for key decision making. Please, read the instructions on how to use it :[How to use Mirall0x](https://github.com/OpenDataforWeb3/Mirall0x/wiki/How-to-use-Mirall0x)')
+    st.markdown('This is an open source project developed to empower communities when analyzing candidates for grants. It uses on-chain and off-chain metadata to deliver quality information in a centralized and visual way for key decision making. Please, read the instructions on how to use it: [How to use Mirall0x](https://github.com/OpenDataforWeb3/Mirall0x/wiki/How-to-use-Mirall0x)')
 
     
 
