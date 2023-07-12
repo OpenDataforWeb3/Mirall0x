@@ -570,7 +570,7 @@ with col1 :
                     
                     weight_web_days = st.number_input("Input a weight for every month that a website existed.", step = 1, key = "weight_web_date")
 
-                    weight_wallet_age = st.number_input("Input weight for each month old of the wallet on the choosen chain,", step = 1, key = "weight_wallet_age")
+                    weight_wallet_age = st.number_input("Input weight for each month old of the wallet on the choosen chain.", step = 1, key = "weight_wallet_age")
                    
                     
                 
