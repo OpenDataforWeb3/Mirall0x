@@ -389,8 +389,8 @@ git_PAT = st.secrets['github_PAT']
 
 with header: 
     st.title('Mirall0x') 
-    st.markdown('#### LOOK INSIDE PROJECTS')
-    st.markdown('This is a application to check details and metadata of projects applying for funding. It empowers humans with metadata and automations to check the assests of projects and spot inconsistencies, for more information check the docs ;) [link]')
+    st.markdown('#### Welcome!')
+    st.markdown('This is an open source project developed to empower communities when analyzing candidates for grants. It uses on-chain and off-chain metadata to deliver quality information in a centralized and visual way for key decision making. Please, read the instructions on how to use it :[How to use Mirall0x](https://github.com/OpenDataforWeb3/Mirall0x/wiki/How-to-use-Mirall0x)')
 
     
 
@@ -398,24 +398,24 @@ with inputs:
     
     st.markdown("#### PROJECTS TO CHECK")  
     # File uploader
-    file = st.file_uploader("Upload CSV file, please check the docs for the correct schema", type="csv", key = 'main_csv') # issue 3 
+    file = st.file_uploader("Upload CSV file, please check the instructions for the correct schema.", type="csv", key = 'main_csv') # issue 3 
     
 
     if file:
         df = input_csv(file)
         if file is not None:
             file_name = file.name
-            st.markdown("###### THE INPUTED CSV:")
+            st.markdown("###### THE INPUTED CSV")
             st.dataframe(df)
 
 
-    st.markdown("#### INPUTS AND PARAMETERS")
+    st.markdown("#### PARAMETERS")
 
     col1,col2 = st.columns(2) 
     
 with col1 : 
-    round_start = st.text_input('input the round start date (or round subscription date) like "yyyy-mm-dd"' , key = 'round_start') 
-    chainName = st.selectbox('Select the chain you would like to check the walle', covalent_chains) 
+    round_start = st.text_input('Round start or round subscription date like "yyyy-mm-dd".' , key = 'round_start') 
+    chainName = st.selectbox('Select the chain to check the recipient wallet address behavior.', covalent_chains) 
                     
     main_button =  st.button('SEND PARAMETERS')
 
@@ -561,28 +561,28 @@ with col1 :
             with st.form('weights'):
                
                 st.markdown("#### WEIGHTING THE LEGOS")
-                st.markdown("input the weight for each lego (from -3 to 3) given your understand of the importance of each analysis. Remenber: the final score represents how trustworth a project is, so positive weights means trustfull behaviour, there fore posite scores and vice-versa")
+                st.markdown("Input the weight for each lego (from -3 to 3) given your understanding of the importance of each behaviour")
                 
                 col3,col4 = st.columns(2)
                 with col3:
 
-                    weight_githb_active_months = st.number_input("input weight for every month the Github repo existed ", step = 1, key = "weight_githb_active_months")
+                    weight_githb_active_months = st.number_input("Input weight for every month the Github repo existed.", step = 1, key = "weight_githb_active_months")
                     
-                    weight_web_days = st.number_input("input a weight for every month that a website existed", step = 1, key = "weight_web_date")
+                    weight_web_days = st.number_input("Input a weight for every month that a website existed.", step = 1, key = "weight_web_date")
 
-                    weight_wallet_age = st.number_input("input weight for each month old of the wallet on the choosen chain", step = 1, key = "weight_wallet_age")
+                    weight_wallet_age = st.number_input("Input weight for each month old of the wallet on the choosen chain,", step = 1, key = "weight_wallet_age")
                    
                     
                 
                 with col4:
                     
-                    weight_githb_not_working = st.number_input("input weight for a Github repo that is not available", step = 1, key = "weight_githb_not_working")
+                    weight_githb_not_working = st.number_input("Input weight for a Github repo url that is not working.", step = 1, key = "weight_githb_not_working")
 
                     
-                    weight_website = st.number_input("input weight for a website that is not available", step = 1, key = "weight_website") 
+                    weight_website = st.number_input("Input weight for a website that is not working.", step = 1, key = "weight_website") 
                     
                     
-                    weight_no_chain_history  = st.number_input("input weight for project wallet that have no transaction hitory", step = 1, key = "weight_no_chain_history")
+                    weight_no_chain_history  = st.number_input("Input weight for project wallet that have no transaction hitory.", step = 1, key = "weight_no_chain_history")
                     
                     
                     
@@ -642,11 +642,11 @@ with col1 :
             
                     ### -  issue #14 #15
 
-                    st.markdown("### VIZUALISE AND COMPARE THE PROJECTs")
-                    st.markdown("tip : click on the two arrows on the right corner to full screen the graph. Hover the mouse to see more information of each dot (projet)") 
+                    st.markdown("### VISUALISE AND COMPARE PROJECTS")
+                    st.markdown("tip : click on the two arrows on the right corner to full screen the plot. Hover the mouse to see more information of each dot (projet).") 
                     st.plotly_chart(plot)
                     st.markdown("")
-                    st.markdown("#### CHECK THE PROJECT INFORMATIONS AND SCORES")
+                    st.markdown("#### PROJECT INFORMATIONS AND SCORES")
                     st.write(legos_avaluations)
 
 
