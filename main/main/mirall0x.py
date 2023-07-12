@@ -582,7 +582,7 @@ with col1 :
                     weight_website = st.number_input("Input weight for a website that is not working.", step = 1, key = "weight_website") 
                     
                     
-                    weight_no_chain_history  = st.number_input("Input weight for project wallet that have no transaction hitory.", step = 1, key = "weight_no_chain_history")
+                    weight_no_chain_history  = st.number_input("Input weight for project wallet that have no transaction history.", step = 1, key = "weight_no_chain_history")
                     
                     
                     
