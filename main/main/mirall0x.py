@@ -310,16 +310,16 @@ def first_wallet_transaction(walletAddress,api_key,chainName):
     return wallets[0], answers[0]
 
 @st.cache_data
-def wallets_age(addresses, api_key,chainName, round_start):
+def wallets_age(recipients, api_key,chainName, round_start):
     
     w_creation_date = []
-    address = []
-    for i in addresses:
-        address.append(i)
+    recipient = []
+    for i in recipients:
+        recipient.append(i)
         w_creation_date.append(first_wallet_transaction(i,api_key,chainName)[1])
 
    
-    w_creation = pd.DataFrame(data= {'address': address, f'w_creation_date_{chainName}': w_creation_date})
+    w_creation = pd.DataFrame(data= {'recipient': recipient, f'w_creation_date_{chainName}': w_creation_date})
 
     months = []
     for i in range(0,w_creation[f'w_creation_date_{chainName}'].shape[0]):
@@ -381,8 +381,8 @@ def website_validation_lego(website_lists):
 
 covalent_chains = ['eth-mainnet' , 'optimism-mainnet' , 'matic-mainnet' , 'btc-mainnet' ] ## issue #12
   
-api_key = st.secrets['covalent_api']
-git_PAT = st.secrets['github_PAT']
+api_key = st.secrets['api_key']
+git_PAT = st.secrets['git_PAT']
 #________________________ main __________________________________________________________________________
 
 
@@ -466,7 +466,7 @@ with col1 :
         with legos:
 
 
-                legos_avaluations = df[['title_x', 'website', 'github_project_url','address_x']].copy() 
+                legos_avaluations = df[['title', 'website', 'github_project_url','recipient']].copy() 
 
 
 
@@ -523,12 +523,11 @@ with col1 :
                 
          #_________________________________ wallet_age lego
         
-                legos_avaluations.rename(columns = {'address_x' : 'address'},inplace = True) ### issue #3 - to be altered when adapeted to Allo Schema
-                addresses = legos_avaluations['address'].copy().dropna()
-                addresses = addresses.reset_index(drop = True)
+                recipients = legos_avaluations['recipient'].copy().dropna()
+                recipients = addresses.reset_index(drop = True)
                 
                 
-                wallet_age_lego = wallets_age(addresses, api_key,chainName, round_start)
+                wallet_age_lego = wallets_age(recipients, api_key,chainName, round_start)
                 
 
                 
@@ -538,7 +537,7 @@ with col1 :
                 legos_avaluations = legos_avaluations.merge(active_months, on = 'github_project_url', how = 'left')  # github lego 
                 legos_avaluations = legos_avaluations.merge(web_df, on = 'website', how = 'left')# website evaluations
                 legos_avaluations = legos_avaluations.merge(count_days_df, on = 'website', how = 'left') # website available dates days count
-                legos_avaluations = legos_avaluations.merge(wallet_age_lego, on = 'address', how = 'left')  # wallet age lego for the chooson chain
+                legos_avaluations = legos_avaluations.merge(wallet_age_lego, on = 'recipient', how = 'left')  # wallet age lego for the chooson chain
 
 
                 legos_avaluations.to_csv('legos_avaluations.csv', index = False)
