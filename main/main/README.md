@@ -12,7 +12,7 @@ pip install -r requirements.txt
 streamlit run main\\main\\mirall0x.py
 ```
 
-#### On MAC OS Using venv
+#### 💻 On MAC OS Using venv
 
 ⬇️ Download the github repo by running
 ```
@@ -30,3 +30,17 @@ python3 -m venv .venv
 ```
 source .venv/bin/activate
 ```
+⚙️Install the required packages for th application.
+```
+pip install -r requirements.txt
+```
+🚀 Lunch the Streamlit app
+```
+streamlit run mirall0x.py
+```
+### ⚠ PS
+To run the app successfully, you need to create a **.streamlit** directory in the main folder containing you mirallOx.py  <br>
+
+
+This folder would contain a secrets.toml file for you to store you covalent_api and github_api keys which can be gotten  <br>
+here respectively _[Covalent](https://www.covalenthq.com/docs/api/)_ and _[GitHub](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)_. 
