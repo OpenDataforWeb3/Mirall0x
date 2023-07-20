@@ -12,7 +12,7 @@ For current project status and roadmap, check the [Mirall0x Project Roadmap Boar
 ## How does it work?  
   
 
-Broadly, It is built on top of the concept of Legos for sybil analysis, a concept developed by the former Gitcoin's Fraud Detection and Defense Workstream and the OpenData Community. Further explanation on legos here. 
+Broadly, It is built on top of the concept of Legos for sybil analysis, a concept developed by the former Gitcoin's Fraud Detection and Defense Workstream and the [OpenData Community](https://opendatacommunity.org/). Further explanation on legos [here](https://opendatacommunity.org/docs/legos). 
 MIrall0x extracts project  data from third party services, treats this data and performs the first layers of calculations. Utilizing ‘weights’ imputed by the user for each ‘behavior’ of a set of  projects, it performs a second layer of calculations resulting in scores for each behavior  and generating an overall score. By the end, projects are displayed in a 3D scatterplot positioned by their score results  to help the user to better visualize ‘riskier’ projects that could be prioritized for further analysis. Optionally, mirall0x provides a CSV file with the legos results and the scores according to  the imputed weights given by the user. 
 
  ![image](https://github.com/OpenDataforWeb3/Mirall0x/assets/25551810/0aba14f2-7479-4fd5-8b21-a33f7288ce11)
