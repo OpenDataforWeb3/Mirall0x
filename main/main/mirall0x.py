@@ -677,16 +677,6 @@ with col1 :
     
                     plot  = px.scatter_3d(final_dataframe, x = x_axis, y = y_axis, z = 'score'  , color = 'score' , hover_data =[final_dataframe['github_project_url']]
                 
-          #________________________________________ vizualisation      
-        
-                    ### -  issue #14 #15
-
-                    st.markdown("### VISUALISE AND COMPARE PROJECTS")
-                    st.markdown("tip : click on the two arrows on the right corner to full screen the plot. Hover the mouse to see more information of each dot (projet).") 
-                    st.plotly_chart(plot)
-                    st.markdown("")
-                    st.markdown("#### PROJECT INFORMATIONS AND SCORES")
-                    st.write(legos_avaluations)
 
 
 #________________________________Download the final df _______________________
