@@ -375,7 +375,53 @@ def website_validation_lego(website_lists):
     web_df['website_date_evaluation'] = website_date_evaluation
     return web_df
 
+@st.cache_data
+def score_calculation(legos_avaluations,
+                      weight_githb_active_months,
+                      weight_githb_not_working,
+                      weight_website,
+                      weight_web_days,
+                      weight_no_chain_history,
+                      weight_wallet_age):
+    github_score = []
 
+    web_score = [] 
+
+    wallet_age_score = []
+
+    for i in range( 0, legos_avaluations.shape[0]):
+
+        github_score.append(np.nansum([
+                 weight_githb_active_months * legos_avaluations['months_active'][i],
+                 weight_githb_not_working* legos_avaluations['invadalid_repo'][i]]))
+
+
+    for i in range( 0, legos_avaluations.shape[0]):
+
+        web_score.append(( np.nansum([
+        weight_website * legos_avaluations['web_not_working'][i], 
+        weight_web_days * legos_avaluations['months_of_existance'][i]])))
+
+
+    for i in range( 0, legos_avaluations.shape[0]):
+
+        wallet_age_score.append(( np.nansum([
+        weight_no_chain_history * legos_avaluations[f'no_history_{chainName}'][i], 
+        weight_wallet_age * legos_avaluations[f'wallet_months_old_{chainName}'][i]])))
+
+
+
+    legos_avaluations['web_score'] = web_score
+    legos_avaluations['github_score'] = github_score
+    legos_avaluations['wallet_age_score'] = wallet_age_score
+
+    legos_avaluations['score'] = (
+    legos_avaluations['web_score'] + 
+    legos_avaluations['github_score'] + 
+    legos_avaluations['wallet_age_score']
+    )
+    
+    return legos_avaluations
 
 #______________________ Assets 
 
@@ -541,7 +587,7 @@ with col1 :
 
 
                 legos_avaluations.to_csv('legos_avaluations.csv', index = False)
-#                 st.write(legos_avaluations)
+
 
         #_______________________________________ legos weights
 
@@ -584,62 +630,55 @@ with col1 :
                     
                     weight_no_chain_history  = st.number_input("Input weight for project wallet that have no transaction history.", step = 1, key = "weight_no_chain_history")
                     
+                if 'calc_button' not in st.session_state: 
+                        st.session_state.calc_button = False 
                     
-                    
+                def activate_calc_buttom():
+                    st.session_state.calc_button = True
+                
+                calculations_button = st.form_submit_button('START CALCULATIONS', on_click = activate_calc_buttom)
+
+                
                     
                     
             #_________________________________________scores calculations
             
             
-                calculations_button = st.form_submit_button('START CALCULATIONS')
-
-            if 'calc_button' not in st.session_state: 
-                st.session_state.calc_button = False 
-
-            if calculations_button or st.session_state.calc_button:
-                    github_score = []
-
-                    web_score = [] 
-                    
-                    wallet_age_score = []
-
-                    for i in range( 0, legos_avaluations.shape[0]):
-
-                        github_score.append(np.nansum([
-                                 weight_githb_active_months * legos_avaluations['months_active'][i],
-                                 weight_githb_not_working* legos_avaluations['invadalid_repo'][i]]))
-
-
-                    for i in range( 0, legos_avaluations.shape[0]):
-
-                        web_score.append(( np.nansum([
-                        weight_website * legos_avaluations['web_not_working'][i], 
-                        weight_web_days * legos_avaluations['months_of_existance'][i]])))
-
-                    
-                    for i in range( 0, legos_avaluations.shape[0]):
-
-                        wallet_age_score.append(( np.nansum([
-                        weight_no_chain_history * legos_avaluations[f'no_history_{chainName}'][i], 
-                        weight_wallet_age * legos_avaluations[f'wallet_months_old_{chainName}'][i]])))
-                        
-                        
-
-                    legos_avaluations['web_score'] = web_score
-                    legos_avaluations['github_score'] = github_score
-                    legos_avaluations['wallet_age_score'] = wallet_age_score
-
-                    legos_avaluations['score'] = (
-                    legos_avaluations['web_score'] + 
-                    legos_avaluations['github_score'] + 
-                    legos_avaluations['wallet_age_score']
-                    )
-
-                    plot  = px.scatter_3d(legos_avaluations, x ='github_score', y = 'wallet_age_score', z = 'score'  , color = 'score' , hover_data =[legos_avaluations['github_project_url']]
-                )
-                    
-              #________________________________________ vizualisation      
+               
+             if calculations_button or st.session_state.calc_button:
             
+                    st.session_state.calc_buttom = True 
+                    
+                    final_dataframe = score_calculation(legos_avaluations,
+                                              weight_githb_active_months,
+                                              weight_githb_not_working,
+                                              weight_website,
+                                              weight_web_days,
+                                              weight_no_chain_history,
+                                              weight_wallet_age)
+    
+    
+                    st.write(final_dataframe)
+    
+                    if "x_axis" not in st.session_state:
+                        st.session_state.x_axis = 'github_score'
+                    if 'y_axis' not in st.session_state:
+                        st.session_state.y_axis = 'wallet_age_score'
+    
+                    possible_axis = ['wallet_age_score', 'github_score', 'web_score']
+    
+                    
+                    
+                    x_axis = st.selectbox('Select x_axis',possible_axis, key = 'x_axis' )
+    
+    
+                    y_axis = st.selectbox('Select y_axis',possible_axis, key = 'y_axis' )
+    
+    
+                    plot  = px.scatter_3d(final_dataframe, x = x_axis, y = y_axis, z = 'score'  , color = 'score' , hover_data =[final_dataframe['github_project_url']]
+                
+          #________________________________________ vizualisation      
+        
                     ### -  issue #14 #15
 
                     st.markdown("### VISUALISE AND COMPARE PROJECTS")
@@ -650,14 +689,25 @@ with col1 :
                     st.write(legos_avaluations)
 
 
+#________________________________Download the final df _______________________
 
-  
-
-            
-        
-        
-        
-        
+ 
+                    st.markdown("#### CHECK THE PROJECT INFORMATIONS AND SCORES")
+                    st.write(final_dataframe)
+                    
+                    @st.cache_data
+                    def convert_df(final_dataframe):
+                        # IMPORTANT: Cache the conversion to prevent computation on every rerun
+                        return final_dataframe.to_csv().encode('utf-8')
+                    
+                    csv = convert_df(final_dataframe)
+                    
+                    st.download_button(
+                    label="Download data as CSV",
+                    data= csv,
+                    file_name='final_dataframe.csv',
+                    mime='text/csv',
+                )
         
         
         
