@@ -21,9 +21,9 @@ MIrall0x extracts project  data from third party services, treats this data and 
 
 ### As a sponsor:  
 The project does not have a revenue model and counts on the good will of it’s first volunteers but aims  to have full time contributors. 
-Financial support can be sent to this address:   
+Financial support can be sent to this SAFE wallet:   
   
-`0xd0A741731B9e34e6C0c3b942EA61aEc26E21C5a2`  
+`matic:0x8136FaE58a12c3d7A5F37B745529bE1b7609649A`  
   
 Soon a wiki page related with project milestones and budget  will be released. 
 
