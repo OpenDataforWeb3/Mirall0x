@@ -641,69 +641,78 @@ with col1 :
                     
                         
                         
-                #_________________________________________scores calculations
+            #_________________________________________scores calculations
+            
+
+    
+            
+
+                
+            if calculations_button or st.session_state.calc_button:
+                
+                st.session_state.calc_buttom = True 
+                
+                final_dataframe = score_calculation(legos_avaluations,
+                                          weight_githb_active_months,
+                                          weight_githb_not_working,
+                                          weight_website,
+                                          weight_web_days,
+                                          weight_no_chain_history,
+                                          weight_wallet_age)
+
+
+                st.write(final_dataframe)
+
+                if "x_axis" not in st.session_state:
+                    st.session_state.x_axis = 'github_score'
+                if 'y_axis' not in st.session_state:
+                    st.session_state.y_axis = 'wallet_age_score'
+
+                possible_axis = ['wallet_age_score', 'github_score', 'web_score']
+
                 
                 
-                   
-                     if calculations_button or st.session_state.calc_button:
-                    
-                            st.session_state.calc_buttom = True 
-                            
-                            final_dataframe = score_calculation(legos_avaluations,
-                                                      weight_githb_active_months,
-                                                      weight_githb_not_working,
-                                                      weight_website,
-                                                      weight_web_days,
-                                                      weight_no_chain_history,
-                                                      weight_wallet_age)
-                    
-                    
-                            st.write(final_dataframe)
-                    
-                            if "x_axis" not in st.session_state:
-                                st.session_state.x_axis = 'github_score'
-                            if 'y_axis' not in st.session_state:
-                                st.session_state.y_axis = 'wallet_age_score'
-                    
-                            possible_axis = ['wallet_age_score', 'github_score', 'web_score']
-                    
-                            
-                            
-                            x_axis = st.selectbox('Select x_axis',possible_axis, key = 'x_axis' )
-                    
-                    
-                            y_axis = st.selectbox('Select y_axis',possible_axis, key = 'y_axis' )
-                    
-                    
-                            plot  = px.scatter_3d(final_dataframe, x = x_axis, y = y_axis, z = 'score'  , color = 'score' , hover_data =[final_dataframe['github_project_url']]
-                        
-                    
-                    
-                    #________________________________Download the final df _______________________
-                    
-                    
-                            st.markdown("#### CHECK THE PROJECT INFORMATIONS AND SCORES")
-                            st.write(final_dataframe)
-                            
-                            @st.cache_data
-                            def convert_df(final_dataframe):
-                                # IMPORTANT: Cache the conversion to prevent computation on every rerun
-                                return final_dataframe.to_csv().encode('utf-8')
-                            
-                            csv = convert_df(final_dataframe)
-                            
-                            st.download_button(
-                            label="Download data as CSV",
-                            data= csv,
-                            file_name='final_dataframe.csv',
-                            mime='text/csv',
-                        )
-            
-            
-        
-        
-        
-        
+                x_axis = st.selectbox('Select x_axis',possible_axis, key = 'x_axis' )
+
+
+                y_axis = st.selectbox('Select y_axis',possible_axis, key = 'y_axis' )
+
+
+                plot  = px.scatter_3d(final_dataframe, x = x_axis, y = y_axis, z = 'score'  , color = 'score' , hover_data =[final_dataframe['github_project_url']]
+        )
+
+
+
+
+
+          #________________________________________ vizualisation      
+
+                ### -  issue #14 #15
+
+                st.markdown("### VIZUALISE AND COMPARE THE PROJECTS")
+                st.markdown("tip : click on the two arrows on the right corner to full screen the graph. Hover the mouse to see more information of each dot (projet)") 
+                st.plotly_chart(plot)
+                st.markdown("")
+#________________________________Download the final df _______________________
+
+
+                st.markdown("#### CHECK THE PROJECT INFORMATIONS AND SCORES")
+                st.write(final_dataframe)
+                
+                @st.cache_data
+                def convert_df(final_dataframe):
+                    # IMPORTANT: Cache the conversion to prevent computation on every rerun
+                    return final_dataframe.to_csv().encode('utf-8')
+                
+                csv = convert_df(final_dataframe)
+                
+                st.download_button(
+                label="Download data as CSV",
+                data= csv,
+                file_name='final_dataframe.csv',
+                mime='text/csv',
+            )
+
         
         
         
