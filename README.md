@@ -2,12 +2,16 @@
 
 Mirall0x app is an open source project developed to empower communities when analyzing candidates for grants. It uses  on-chain and off-chain metadata to deliver quality information in a centralized and visual way for key decision making.  
 
-For an explanation of one of the main use cases and a demo of the current app version check this video : 
-
-
-[<img src="https://cdn.loom.com/sessions/thumbnails/de5f3595d12e494492d06e82ddf18694-with-play.gif">](https://www.loom.com/share/de5f3595d12e494492d06e82ddf18694?sid=79c87ed2-53ca-4997-96d9-8e10bf439eef)
+- For an explanation of one of the main use cases of the app check this [video](https://www.loom.com/share/de5f3595d12e494492d06e82ddf18694?sid=79c87ed2-53ca-4997-96d9-8e10bf439eef)
   
-For current project status and roadmap, check the [Mirall0x Project Roadmap Board](https://miro.com/app/board/uXjVM102fu8=/?share_link_id=463572857130)  
+- For current project status and roadmap, check the [Mirall0x Project Roadmap Board](https://miro.com/app/board/uXjVM102fu8=/?share_link_id=463572857130)  
+
+- For a overview of the current version, check this demo: 
+
+[<img src="https://cdn.loom.com/sessions/thumbnails/1d4af7c2cdb64cc7bae0de4f8ae494dc-with-play.gif">](https://www.loom.com/share/1d4af7c2cdb64cc7bae0de4f8ae494dc?sid=f975e770-13f3-4eda-b6a0-51a7aa28ee40)
+
+  
+
 
 ## How does it work?  
   
