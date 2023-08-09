@@ -1,8 +1,3 @@
-# pip install htmldate  ## verify docker and necessity of using it 
-# pip install import plotly_express as px 
-# pip install python-whois
-pip install gspread
-
 import streamlit as st
 import pandas as pd 
 import numpy as np 
