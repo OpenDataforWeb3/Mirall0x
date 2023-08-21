@@ -14,9 +14,7 @@ Mirall0x app is an open source project developed to empower communities when ana
 
   
 
-
-## How does it work?  
-  
+## How does it work?    
 
 Broadly, it is built on top of the concept of Legos for sybil analysis, a concept developed by the former Gitcoin's Fraud Detection and Defense Workstream and the [OpenData Community](https://opendatacommunity.org/). An more detailed explanation on Legos can be found [here](https://opendatacommunity.org/docs/legos). 
 Mirall0x extracts project  data from third party services, treats this data and performs the first layers of calculations. Utilizing ‘weights’ inputted by the user for each ‘behavior’ of a set of  projects, it performs a second layer of calculations resulting in scores for each behavior and generating an overall score. By the end, projects are displayed in a 3D scatterplot positioned by their score results to help the user to better visualize ‘riskier’ projects that could be prioritized for further analysis. Optionally, Mirall0x provides a CSV file with the Legos results and the scores according to the inputted weights given by the user. 
@@ -34,10 +32,10 @@ Financial support can be sent to this SAFE wallet:
 Soon a wiki page related with project milestones and budget  will be released. 
 
 ### As a collaborator:  
-Check out our issues and see if there is something that you feel like helping out. Some issues have tags of prioritization and we suggest checking this one first. If you have any feedback, doubts or issues that you think are worth tackling, please contact @stefi_says on the  [Mirall0x discord channel](https://discord.gg/Ujy25x8e).   
-It is  worth mentioning that @stefi posts updates on the development of the project every fifteen(ish) days. Keep an eye on her [Twitter](https://twitter.com/stefi_says) 
+Check out our issues and see if there is something that you feel you want to help out with. Some issues have tags of prioritization and we suggest checking this one first. If you have any feedback, doubts or issues that you think are worth tackling, please contact @stefi_says on the [Mirall0x discord channel](https://discord.gg/Ujy25x8e).   
+It is  worth mentioning that @stefi posts project updates every fifteen(ish) days. Keep an eye on her [Twitter](https://twitter.com/stefi_says) 
 
-Thanks for your interest on the project! 
+Thanks for your interest in this project! 
 
 
 
