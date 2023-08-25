@@ -637,10 +637,11 @@ with col1 :
 
         repo_additions = x1[0]
         w3 = iws.API(token=st.secrets["storage_token"])
-        dataframe_csv = repo_additions.to_csv(f'Github_repo_additions_{current_time}.csv')
 
         current_time = datetime.datetime.fromisoformat()
         current_time = current_time.isoformat()
+
+        dataframe_csv = repo_additions.to_csv(f'Github_repo_additions_{current_time}.csv')
 
         repo_additions_cid = w3.post_upload((f'Github_repo_additions_{current_time}.csv', open(f'Github_repo_additions_{current_time}.csv', 'rb')))
 
@@ -876,8 +877,27 @@ with col1 :
                 def convert_df(final_dataframe):
                     # IMPORTANT: Cache the conversion to prevent computation on every rerun
                     return final_dataframe.to_csv().encode('utf-8')
+
+                # @st.cache_data
+                # def store_df(final_dataframe):
+                #     # IMPORTANT: Cache the conversion to prevent computation on every rerun
+                #     current_time = datetime.datetime.fromisoformat()
+                #     current_time = current_time.isoformat()
+
+                #     dataframe_csv = final_dataframe.to_csv(f'Project_info_scores_{current_time}.csv')
+
+                #     project_cid = w3.post_upload((f'Project_info_scores_{current_time}.csv', open(f'Project_info_scores_{current_time}.csv', 'rb')))
+
+                #     if project_cid is not None:
+                #         st.success(f'Please find your query results on project scores using this CID {project_cid}', icon="✅")
+                #     else:
+                #         st.success(f'We were unable to store your query results. Please contact admin.')
+                    
+                #     return project_cid
                 
                 csv = convert_df(final_dataframe)
+
+                # ifps_csv = store_df(final_dataframe)
                 
                 st.download_button(
                 label="Download data as CSV",
@@ -885,6 +905,8 @@ with col1 :
                 file_name='final_dataframe.csv',
                 mime='text/csv',
             )
+
+                # st.button('Store data on IPFS', on_click=store_df)
 
         
         
