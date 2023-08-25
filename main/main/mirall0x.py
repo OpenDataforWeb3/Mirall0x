@@ -16,9 +16,7 @@ import gspread
 
 from datetime import datetime as dt
 from datetime import timedelta
-
-
-
+from ipfs_web3storage as iws
 
 title = st.container()
 header = st.container()
@@ -638,6 +636,19 @@ with col1 :
         repo_raw_data = returned[1]
 
         repo_additions = x1[0]
+        w3 = iws.API(token=st.secrets["storage_token"])
+        dataframe_csv = repo_additions.to_csv(f'Github_repo_additions_{current_time}.csv')
+
+        current_time = datetime.datetime.fromisoformat()
+        current_time = current_time.isoformat()
+
+        repo_additions_cid = w3.post_upload((f'Github_repo_additions_{current_time}.csv', open(f'Github_repo_additions_{current_time}.csv', 'rb')))
+
+        if repo_additions_cid is not None:
+            st.success(f'Please find a querry results on repository''s additions using this CID {repo_additions_cid}', icon="✅")
+        else:
+            st.success(f'We were unable to store your query results. Please contact admin.')
+
         repo_deletions = x1[1]
             
 
